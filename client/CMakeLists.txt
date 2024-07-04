@@ -1,9 +1,11 @@
 project(${CMAKE_PROJECT_NAME}Client VERSION 0.0.1 LANGUAGES CXX)
 
 set(HEADERS
+    src/client.h
 )
 
 set(SOURCES
+    src/client.cc
 )
 
 add_executable(${PROJECT_NAME}
@@ -12,8 +14,8 @@ add_executable(${PROJECT_NAME}
     src/main.cc
 )
 
-add_dependencies(${PROJECT_NAME}
-)
+# add_dependencies(${PROJECT_NAME}
+# )
 
 target_compile_features(${PROJECT_NAME}
     PRIVATE

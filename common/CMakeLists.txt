@@ -9,7 +9,6 @@ set(SOURCES
 add_executable(${PROJECT_NAME}
     ${HEADERS}
     ${SOURCES}
-    main.cc
 )
 
 add_dependencies(${PROJECT_NAME}
