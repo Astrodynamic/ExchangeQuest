@@ -2,12 +2,15 @@
 
 #include "server.h"
 
-int main(int argc, char* argv[]) {
+int main() {
   try {
-    boost::asio::io_context io_context;
-  } catch (std::exception& e) {
-    std::cerr << "Exception: " << e.what() << "\n";
+    boost::asio::io_context context;
+    Server server(context, common::kPort);
+    server.AsyncAccept();
+    context.run();
+  } catch (const std::exception& e) {
+    std::cerr << e.what() << std::endl;
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 }

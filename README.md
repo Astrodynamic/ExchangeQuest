@@ -37,7 +37,6 @@ To run the client:
 ## Testing
 The project includes unit tests for order matching and other functionalities. To run the tests, follow these steps:
 
-Navigate to the build directory:
 ```sh
 make tests
 ```
