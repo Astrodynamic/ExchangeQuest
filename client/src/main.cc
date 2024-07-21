@@ -1,18 +1,12 @@
 #include <iostream>
 
-#include "client.h"
+#include "interface.h"
 
 int main() {
   try {
-    boost::asio::io_context context;
-    Client client(context);
-    client.AsyncConnect(common::kIP.data(), std::to_string(common::kPort));
-
-    command::Data regCmd;
-    regCmd.type = command::Type::kRegistrationRequest;
-    client.Send(regCmd);
-
-    context.run();
+    Client client;
+    Interface interface(client);
+    interface.Exec();
   } catch (const std::exception& e) {
     std::cerr << e.what() << std::endl;
   }

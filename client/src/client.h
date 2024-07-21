@@ -1,13 +1,16 @@
 #pragma once
 
+#include <optional>
+#include <thread>
+
 #include <boost/asio.hpp>
 
 #include "command.h"
-#include "common.h"
 
 class Client {
  public:
-  Client(boost::asio::io_context& context);
+  Client();
+  ~Client();
 
   auto AsyncConnect(const std::string& host, const std::string& port) -> void;
   auto Connected() const -> bool;
@@ -29,6 +32,9 @@ class Client {
   std::array<std::byte, sizeof(command::Data)> m_buffer_r;
   std::array<std::byte, sizeof(command::Data)> m_buffer_w;
 
+  boost::asio::io_context m_context;
   boost::asio::ip::tcp::socket m_socket;
   boost::asio::ip::tcp::resolver m_resolver;
+
+  std::optional<std::thread> m_context_thread;
 };

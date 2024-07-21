@@ -7,10 +7,14 @@ include_directories(${Boost_INCLUDE_DIR})
 
 set(HEADERS
     src/client.h
+    src/ainterface.h
+    src/interface.h
 )
 
 set(SOURCES
     src/client.cc
+    src/ainterface.cc
+    src/interface.cc
 )
 
 add_executable(${PROJECT_NAME}
