@@ -21,11 +21,7 @@ auto Exchange::Order(const order::Data&& data) -> void {
   MatchOrders(data.instrument.code);
 }
 
-auto Exchange::Balance(common::uid_t uid) -> double {
-  return m_accounts[uid].m_instruments[order::Instrument::RUB()].data.decimal;
-}
-
-auto Exchange::Instruments(common::uid_t uid) -> std::unordered_map<order::instrument_t, order::Amount> {
+auto Exchange::Balance(common::uid_t uid) -> const std::unordered_map<order::instrument_t, order::Amount>& {
   return m_accounts[uid].m_instruments;
 }
 
@@ -49,7 +45,7 @@ auto Exchange::MatchOrders(order::instrument_t instrument) -> void {
       
       if (b_amount > s_amount) {
         s_account.m_instruments[order::Instrument::RUB()] += s_amount * b_data.price;
-        s_account.m_instruments[order::Instrument::RUB()] -= s_amount * b_data.price;
+        b_account.m_instruments[order::Instrument::RUB()] -= s_amount * b_data.price;
         s_account.m_instruments[b_data.instrument.code] -= s_amount;
         b_account.m_instruments[b_data.instrument.code] += s_amount;
 
@@ -65,7 +61,7 @@ auto Exchange::MatchOrders(order::instrument_t instrument) -> void {
         b_queue.push(b_data);
       } else if (b_amount < s_amount) {
         s_account.m_instruments[order::Instrument::RUB()] += b_amount * b_data.price;
-        s_account.m_instruments[order::Instrument::RUB()] -= b_amount * b_data.price;
+        b_account.m_instruments[order::Instrument::RUB()] -= b_amount * b_data.price;
         s_account.m_instruments[b_data.instrument.code] -= b_amount;
         b_account.m_instruments[b_data.instrument.code] += b_amount;
 
@@ -81,7 +77,7 @@ auto Exchange::MatchOrders(order::instrument_t instrument) -> void {
         s_queue.push(s_data);
       } else {
         s_account.m_instruments[order::Instrument::RUB()] += b_amount * b_data.price;
-        s_account.m_instruments[order::Instrument::RUB()] -= s_amount * b_data.price;
+        b_account.m_instruments[order::Instrument::RUB()] -= s_amount * b_data.price;
         s_account.m_instruments[b_data.instrument.code] -= b_amount;
         b_account.m_instruments[b_data.instrument.code] += s_amount;
 

@@ -6,7 +6,7 @@ Server::Server(boost::asio::io_context& context, std::uint16_t port)
     : m_context(context),
       m_acceptor(context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port)) {}
 
-void Server::AsyncAccept() {
+auto Server::AsyncAccept() -> void {
   m_socket.emplace(m_context);
   m_acceptor.async_accept(*m_socket, [this](boost::system::error_code error) {
     if (!error) {

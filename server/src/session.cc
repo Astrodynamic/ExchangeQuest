@@ -1,20 +1,19 @@
 #include "session.h"
 
 #include <iostream>
-#include <boost/bind/bind.hpp>
 
-#include "command.h"
+#include <boost/bind/bind.hpp>
 
 Session::Session(boost::asio::ip::tcp::socket socket, Exchange& exchange)
     : m_socket(std::move(socket)), m_exchange(exchange) {
   InitializeHandlers();
 }
 
-void Session::Start() {
+auto Session::Start() -> void {
   AsyncRead();
 }
 
-void Session::InitializeHandlers() {
+auto Session::InitializeHandlers() -> void {
   m_handlers[command::Type::kRegistrationRequest] = [this](const command::Data& command) {
     command::Data response;
     response.type = command::Type::kRegistrationResponse;
@@ -31,7 +30,7 @@ void Session::InitializeHandlers() {
   m_handlers[command::Type::kLoginRequest] = [this](const command::Data& command) {
     command::Data response;
     response.type = command::Type::kLoginResponse;
-    response.data.login_response.status = m_exchange.Login(command.data.login_request.uid);
+    response.data.login_response.status = m_exchange.Login(command.UID);
     m_handlers[response.type](response);
   };
 
@@ -76,7 +75,20 @@ void Session::InitializeHandlers() {
     command::Data response;
     response.type = command::Type::kBalansResponse;
     response.data.balans_response.status = true;
-    response.data.balans_response.balance = m_exchange.Balance(command.data.balans_request.uid);
+
+    const auto& balance = m_exchange.Balance(command.UID);
+
+    std::size_t index{}, size{response.data.balans_response.balance.size()};
+    for (const auto& [instrument, amount] : balance) {
+      if (index < size) {
+        response.data.balans_response.balance[index++] = {
+          .instrument = instrument,
+          .amount = amount
+        };
+      } else {
+        break;
+      }
+    }
     m_handlers[response.type](response);
   };
 
@@ -86,7 +98,7 @@ void Session::InitializeHandlers() {
   };
 }
 
-void Session::AsyncRead() {
+auto Session::AsyncRead() -> void {
   m_socket.async_receive(
     boost::asio::buffer(m_buffer_r), boost::bind(
       &Session::onRead,
@@ -97,7 +109,7 @@ void Session::AsyncRead() {
   );
 }
 
-void Session::AsyncWrite() {
+auto Session::AsyncWrite() -> void {
   m_socket.async_send(
     boost::asio::buffer(m_buffer_w), boost::bind(
       &Session::onWrite,
@@ -108,7 +120,7 @@ void Session::AsyncWrite() {
   );
 }
 
-void Session::onRead(boost::system::error_code error, std::size_t bytes) {
+auto Session::onRead(boost::system::error_code error, std::size_t bytes) -> void {
   if (!error && sizeof(command::Data) >= bytes) {
     command::Data command;
     std::memcpy(&command, m_buffer_r.data(), sizeof(command::Data));
@@ -120,7 +132,7 @@ void Session::onRead(boost::system::error_code error, std::size_t bytes) {
   }
 }
 
-void Session::onWrite(boost::system::error_code error, std::size_t bytes) {
+auto Session::onWrite(boost::system::error_code error, std::size_t bytes) -> void {
   if (!error && bytes >= sizeof(command::Data)) {
     AsyncRead();
   } else if (error == boost::asio::error::eof) {

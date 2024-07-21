@@ -1,14 +1,19 @@
 #pragma once
 
-#include "common.h"
+#include <array>
+
+#include "order.h"
 
 namespace balans {
-  struct Request {
-    common::uid_t uid;
+  struct Data {
+    order::instrument_t instrument;
+    order::Amount amount;
   };
+
+  struct Request {};
 
   struct Response {
     bool status;
-    double balance;
+    std::array<Data, order::Instrument::Size()> balance;
   };
 }  // namespace balans

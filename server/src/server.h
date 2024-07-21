@@ -9,7 +9,7 @@ class Server {
  public:
   Server(boost::asio::io_context& context, std::uint16_t port);
 
-  void AsyncAccept();
+  auto AsyncAccept() -> void;
 
  private:
   boost::asio::io_context& m_context;

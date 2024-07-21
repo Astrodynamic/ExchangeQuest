@@ -5,7 +5,6 @@
 #include "registration.h"
 #include "order.h"
 #include "balans.h"
-#include "instruments.h"
 
 namespace command {
 enum class Type : std::uint8_t {
@@ -17,8 +16,6 @@ enum class Type : std::uint8_t {
   kOrderResponce,
   kBalansRequest,
   kBalansResponse,
-  kInstrumentsRequest,
-  kInstrumentsResponse
 };
 
 struct Data {
@@ -33,8 +30,6 @@ struct Data {
     order::Response order_response;
     balans::Request balans_request;
     balans::Response balans_response;
-    instruments::Request instruments_request;
-    instruments::Response instruments_response;
   } data;
   std::uint64_t timestamp;
 };

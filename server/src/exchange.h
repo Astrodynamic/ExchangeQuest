@@ -12,11 +12,15 @@ class Exchange {
   auto Registration() -> common::uid_t;
   auto Login(common::uid_t uid) -> bool;
   auto Order(const order::Data&& data) -> void;
-  auto Balance(common::uid_t uid) -> double;
-  auto Instruments(common::uid_t uid) -> std::unordered_map<order::instrument_t, order::Amount>;
+  auto Balance(common::uid_t uid) -> const std::unordered_map<order::instrument_t, order::Amount>&;
 
  private:
-  inline static std::atomic<uid_t> uid{};
+  enum class UIDType : common::uid_t {
+    kServer = 0,
+    kClient
+  };
+
+  inline static std::atomic<common::uid_t> uid{static_cast<common::uid_t>(UIDType::kClient)};
   std::unordered_map<common::uid_t, Account> m_accounts;
   std::unordered_map<order::instrument_t, std::priority_queue<order::Data, std::vector<order::Data>, std::greater<order::Data>>> m_orders_buy;
   std::unordered_map<order::instrument_t, std::priority_queue<order::Data, std::vector<order::Data>, std::less<order::Data>>> m_orders_sell;

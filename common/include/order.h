@@ -10,12 +10,14 @@ namespace order {
   
 union Instrument {
   enum class Type: std::uint8_t {
-    kCurrency
+    kCurrency = 0,
+    kAll
   };
 
   enum class Currency: std::uint8_t {
-    kRUB,
-    kUSD
+    kRUB = 0,
+    kUSD,
+    kAll
   };
 
   struct {
@@ -24,12 +26,16 @@ union Instrument {
   } data;
   std::uint16_t code;
 
-  static std::uint16_t Code(Type type, std::uint8_t id) {
+  constexpr static auto Code(Type type, std::uint8_t id) -> std::uint16_t {
     return (static_cast<std::uint16_t>(type) << 8) | id;
   }
 
-  static std::uint16_t RUB() {
+  constexpr static auto RUB() -> std::uint16_t {
     return Code(Type::kCurrency, static_cast<std::uint8_t>(Currency::kRUB));
+  }
+
+  constexpr static auto Size() -> std::size_t {
+    return static_cast<std::size_t>(Currency::kAll);
   }
 };
 
@@ -46,11 +52,11 @@ struct Amount {
     double decimal;
   } data;
 
-  bool operator==(const Amount& other) const {
+  auto operator==(const Amount& other) const -> bool {
     return !(*this < other) && !(*this > other);
   }
 
-  bool operator<(const Amount& other) const {
+  auto operator<(const Amount& other) const -> bool {
     if (type == Type::kInteger) {
       return data.integer < other.data.integer;
     } else if (type == Type::kDecimal) {
@@ -59,11 +65,11 @@ struct Amount {
     return false;
   }
 
-  bool operator<=(const Amount& other) const {
+  auto operator<=(const Amount& other) const -> bool {
     return *this < other || *this == other;
   }
 
-  bool operator>(const Amount& other) const {
+  auto operator>(const Amount& other) const -> bool {
     if (type == Type::kInteger) {
       return data.integer > other.data.integer;
     } else if (type == Type::kDecimal) {
@@ -72,11 +78,11 @@ struct Amount {
     return false;
   }
 
-  bool operator>=(const Amount& other) const {
+  auto operator>=(const Amount& other) const -> bool {
     return *this > other || *this == other;
   }
 
-  Amount& operator+=(const Amount& other) {
+  auto operator+=(const Amount& other) -> Amount& {
     if (type == Type::kInteger) {
       data.integer += other.data.integer;
     } else if (type == Type::kDecimal) {
@@ -85,7 +91,7 @@ struct Amount {
     return *this;
   }
 
-  Amount& operator-=(const Amount& other) {
+  auto operator-=(const Amount& other) -> Amount& {
     if (type == Type::kInteger) {
       data.integer -= other.data.integer;
     } else if (type == Type::kDecimal) {
@@ -94,7 +100,7 @@ struct Amount {
     return *this;
   }
 
-  Amount operator*(double other) const {
+  auto operator*(double other) const -> Amount {
     Amount result = *this;
     if (type == Type::kInteger) {
       result.data.integer *= other;
@@ -120,7 +126,7 @@ struct Data {
   std::uint64_t timestamp;
   std::function<void(Data)> command;
 
-  bool operator<(const Data& other) const {
+  auto operator<(const Data& other) const -> bool {
     if (price < other.price) {
       return true;
     } else if (std::abs(price - other.price) < 1.0e-6) {
@@ -129,7 +135,7 @@ struct Data {
     return false;
   }
 
-  bool operator>(const Data& other) const {
+  auto operator>(const Data& other) const -> bool {
     if (price > other.price) {
       return true;
     } else if (std::abs(price - other.price) < 1.0e-6) {

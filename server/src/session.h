@@ -9,15 +9,15 @@ class Session : public std::enable_shared_from_this<Session> {
  public:
   Session(boost::asio::ip::tcp::socket socket, Exchange& exchange);
 
-  void Start();
+  auto Start() -> void;
 
  private:
-  void InitializeHandlers();
-  void AsyncRead();
-  void AsyncWrite();
+  auto InitializeHandlers() -> void;
+  auto AsyncRead() -> void;
+  auto AsyncWrite() -> void;
 
-  void onRead(boost::system::error_code error, std::size_t bytes);
-  void onWrite(boost::system::error_code error, std::size_t bytes);
+  auto onRead(boost::system::error_code error, std::size_t bytes) -> void;
+  auto onWrite(boost::system::error_code error, std::size_t bytes) -> void;
 
   std::unordered_map<command::Type, std::function<void(const command::Data&)>> m_handlers;
 

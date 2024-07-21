@@ -1,11 +1,7 @@
 #pragma once
 
-#include "common.h"
-
 namespace login {
-  struct Request {
-    common::uid_t uid;
-  };
+  struct Request {};
 
   struct Response {
     bool status;
