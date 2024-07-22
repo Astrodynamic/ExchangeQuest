@@ -1,6 +1,7 @@
 #include "exchange.h"
 
 #include <algorithm>
+#include <chrono>
 
 auto Exchange::Registration() -> common::uid_t {
   const auto uid = GenerateUID();
@@ -35,6 +36,10 @@ auto Exchange::MatchOrders(order::instrument_t instrument) -> void {
   while (!b_queue.empty() && !s_queue.empty()) {
     order::Data b_data = b_queue.top();
     order::Data s_data = s_queue.top();
+
+    const auto timestamp = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+    s_data.timestamp = timestamp;
+    b_data.timestamp = timestamp;
     
     if (b_data.price >= s_data.price) {
       Account& b_account = m_accounts[b_data.UID];

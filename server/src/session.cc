@@ -16,9 +16,11 @@ auto Session::Start() -> void {
 auto Session::InitializeHandlers() -> void {
   m_handlers[command::Type::kRegistrationRequest] = [this](const command::Data& command) {
     command::Data response;
+    response.UID = command.UID;
     response.type = command::Type::kRegistrationResponse;
     response.data.registration_response.status = true;
     response.data.registration_response.uid = m_exchange.Registration();
+    response.timestamp = command.timestamp;
     m_handlers[response.type](response);
   };
 
@@ -29,8 +31,10 @@ auto Session::InitializeHandlers() -> void {
 
   m_handlers[command::Type::kLoginRequest] = [this](const command::Data& command) {
     command::Data response;
+    response.UID = command.UID;
     response.type = command::Type::kLoginResponse;
-    response.data.login_response.status = m_exchange.Login(command.UID);
+    response.data.login_response.status = m_exchange.Login(command.data.login_request.UID);
+    response.data.login_response.UID = command.data.login_request.UID;
     m_handlers[response.type](response);
   };
 
@@ -73,6 +77,7 @@ auto Session::InitializeHandlers() -> void {
 
   m_handlers[command::Type::kBalansRequest] = [this](const command::Data& command) {
     command::Data response;
+    response.UID = command.UID;
     response.type = command::Type::kBalansResponse;
     response.data.balans_response.status = true;
 
@@ -121,7 +126,7 @@ auto Session::AsyncWrite() -> void {
 }
 
 auto Session::onRead(boost::system::error_code error, std::size_t bytes) -> void {
-  if (!error && sizeof(command::Data) >= bytes) {
+  if (!error && bytes >= sizeof(command::Data)) {
     command::Data command;
     std::memcpy(&command, m_buffer_r.data(), sizeof(command::Data));
     m_handlers[command.type](command);

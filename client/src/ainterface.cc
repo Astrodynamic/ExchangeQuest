@@ -24,7 +24,7 @@ auto AbstractInterface::ShowMenu(const std::string &menu, const std::size_t item
 
   std::int64_t result;
   while (!sscanf(line.c_str(), "%ld", &result) || result <= min || result >= max) {
-    std::cout << "Incorrect input, try again: ";
+    std::cout << "\nIncorrect input, try again: ";
     std::getline(std::cin, line);
   }
 

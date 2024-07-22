@@ -17,24 +17,23 @@ class Interface final : virtual public AbstractInterface {
  private:
   enum MenuFuncs : std::size_t {
     kMainFuncMenu = 0U,
-    kLoadConf,
-    kUnloadConf,
-    kEncode,
-    kDecode,
-    kGenerate,
+    kOrderFuncMenu,
     kMenuFuncsAll
   };
 
   enum MenuItem : std::size_t {
     kIntroduction = 0U,
     kMainMenu,
-    kLoadMenu,
-    kGenerateMenu,
-    kNotExistMenus,
+    kUIDMenu,
+    kOrderMenu,
+    kNoConnectMenu,
+    kLoginMenu,
+    kOrderErrorMenu,
     kCompletion
   };
 
   Client& m_client;
 
   auto InitFuncMenus() -> void;
+  auto Validate(bool loged = false) -> bool;
 };

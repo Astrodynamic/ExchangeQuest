@@ -19,7 +19,7 @@ enum class Type : std::uint8_t {
 };
 
 struct Data {
-  common::uid_t UID;
+  common::uid_t UID{static_cast<common::uid_t>(common::UIDType::kCommon)};
   Type type;
   union {
     registration::Request registration_request;

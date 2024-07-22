@@ -21,8 +21,8 @@ class Session : public std::enable_shared_from_this<Session> {
 
   std::unordered_map<command::Type, std::function<void(const command::Data&)>> m_handlers;
 
-  std::array<std::byte, sizeof(command::Data)> m_buffer_r;
-  std::array<std::byte, sizeof(command::Data)> m_buffer_w;
+  std::array<std::byte, sizeof(command::Data)> m_buffer_r{};
+  std::array<std::byte, sizeof(command::Data)> m_buffer_w{};
 
   boost::asio::ip::tcp::socket m_socket;
   Exchange& m_exchange;

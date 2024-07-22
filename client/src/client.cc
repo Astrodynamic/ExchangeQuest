@@ -1,6 +1,7 @@
 #include "client.h"
 
 #include <iostream>
+#include <chrono>
 
 #include <boost/bind/bind.hpp>
 
@@ -11,37 +12,42 @@ Client::Client() : m_socket(m_context), m_resolver(m_context) {
 }
 
 Client::~Client() {
-  Close();
   if (m_context_thread) {
+    m_socket.close();
     m_context.stop();
     m_context_thread->join();
   }
 }
 
 auto Client::AsyncConnect(const std::string& host, const std::string& port) -> void {
-  boost::asio::async_connect(m_socket, m_resolver.resolve(host, port), boost::bind(&Client::onConnect, this, boost::asio::placeholders::error));
-  m_context_thread = std::thread([this]() {
-    m_context.run();
-  });
+  if (!m_connected) {
+    boost::asio::async_connect(m_socket, m_resolver.resolve(host, port), boost::bind(&Client::onConnect, this, boost::asio::placeholders::error));
+    if (!m_context_thread) {
+      m_context_thread = std::thread([this]() {
+        m_context.run();
+      });
+    }
+  } else {
+    std::cerr << "Connection is already open." << std::endl;
+  }
 }
 
 auto Client::Connected() const -> bool {
-  return m_socket.is_open();
+  return m_connected;
 }
 
-auto Client::Close() -> void {
-  boost::asio::post(m_socket.get_executor(), [this]() {
-    if (Connected()) {
-      m_socket.close();
-    }
-  });
+auto Client::Logined() const -> bool {
+  return m_UID >= static_cast<common::uid_t>(common::UIDType::kClient);
 }
 
-auto Client::Send(const command::Data& command) -> bool {
+auto Client::Send(command::Data& command) -> bool {
   if (!Connected()) {
     std::cerr << "Socket is not open." << std::endl;
     return false;
   }
+
+  command.UID = m_UID;
+  command.timestamp = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
 
   std::memcpy(m_buffer_w.data(), &command, sizeof(command));
   AsyncWrite();
@@ -55,7 +61,7 @@ auto Client::InitializeHandlers() -> void {
   };
 
   m_handlers[command::Type::kRegistrationResponse] = [this](const command::Data& command) {
-    std::cout << "UID: " << command.UID << std::endl;
+    std::cout << "Registration UID: " << command.data.registration_response.uid << std::endl;
   };
 
   m_handlers[command::Type::kLoginRequest] = [this](const command::Data& command) {
@@ -64,7 +70,12 @@ auto Client::InitializeHandlers() -> void {
   };
 
   m_handlers[command::Type::kLoginResponse] = [this](const command::Data& command) {
-    
+    if (command.data.login_response.status) {
+      m_UID = command.data.login_response.UID;
+      std::cout << "Login success. UID: " << m_UID << std::endl;
+    } else {
+      std::cout << "Login failed.\n";
+    }
   };
 
   m_handlers[command::Type::kOrderRequest] = [this](const command::Data& command) {
@@ -73,7 +84,16 @@ auto Client::InitializeHandlers() -> void {
   };
 
   m_handlers[command::Type::kOrderResponce] = [this](const command::Data& command) {
-    
+    const auto& data = command.data.order_response;
+    static std::unordered_map<std::uint16_t, std::string> instruments {
+      {order::Instrument::RUB(), "RUB"},
+      {order::Instrument::USD(), "USD"}
+    };
+
+    std::cout << "Order instrument: " << instruments[data.instrument.code] << std::endl;
+    std::cout << "Order amount: " << data.amount << std::endl;
+    std::cout << "Order price: " << data.price << std::endl;
+    std::cout << "Order type: " << (data.type == order::Type::kBuy ? "BUY" : "SELL") << std::endl;
   };
 
   m_handlers[command::Type::kBalansRequest] = [this](const command::Data& command) {
@@ -82,7 +102,15 @@ auto Client::InitializeHandlers() -> void {
   };
 
   m_handlers[command::Type::kBalansResponse] = [this](const command::Data& command) {
+    const auto& data = command.data.balans_response;
+    static std::unordered_map<std::uint16_t, std::string> instruments {
+      {order::Instrument::RUB(), "RUB"},
+      {order::Instrument::USD(), "USD"}
+    };
 
+    for (const auto& instrument : data.balance) {
+      std::cout << instruments[instrument.instrument] << " : " << instrument.amount << std::endl;
+    }
   };
 }
 
@@ -106,9 +134,11 @@ auto Client::AsyncWrite() -> void {
 
 auto Client::onConnect(const boost::system::error_code& error) -> void {
   if (!error) {
+    m_connected = true;
     std::cout << "Successfully connected to the server." << std::endl;
     AsyncRead();
   } else {
+    m_connected = false;
     std::cerr << "Connect error: " << error.message() << std::endl;
   }
 }

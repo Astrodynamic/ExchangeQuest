@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <functional>
+#include <iostream>
 
 #include "common.h"
 
@@ -34,8 +35,18 @@ union Instrument {
     return Code(Type::kCurrency, static_cast<std::uint8_t>(Currency::kRUB));
   }
 
+  constexpr static auto USD() -> std::uint16_t {
+    return Code(Type::kCurrency, static_cast<std::uint8_t>(Currency::kUSD));
+  }
+
   constexpr static auto Size() -> std::size_t {
     return static_cast<std::size_t>(Currency::kAll);
+  }
+
+  void Set(Type type, std::uint8_t id) {
+    data.type = type;
+    data.id = id;
+    code = Code(type, id);
   }
 };
 
@@ -108,6 +119,15 @@ struct Amount {
       result.data.decimal *= other;
     }
     return result;
+  }
+
+  friend std::ostream& operator<<(std::ostream& os, const Amount& amount) {
+    if (amount.type == Amount::Type::kInteger) {
+      os << amount.data.integer;
+    } else if (amount.type == Amount::Type::kDecimal) {
+      os << amount.data.decimal;
+    }
+    return os;
   }
 };
 
