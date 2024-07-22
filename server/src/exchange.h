@@ -12,7 +12,7 @@ class Exchange {
   auto Registration() -> common::uid_t;
   auto Login(common::uid_t uid) -> bool;
   auto Order(const order::Data&& data) -> void;
-  auto Balance(common::uid_t uid) -> const std::unordered_map<order::instrument_t, order::Amount>&;
+  auto Balance(common::uid_t uid) -> const std::unordered_map<order::instrument_t, double>&;
 
  private:
   inline static std::atomic<common::uid_t> uid{static_cast<common::uid_t>(common::UIDType::kClient)};

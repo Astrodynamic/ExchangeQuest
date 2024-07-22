@@ -52,85 +52,6 @@ union Instrument {
 
 using instrument_t = decltype(Instrument::code);
 
-struct Amount {
-  enum class Type: std::uint8_t {
-    kInteger,
-    kDecimal
-  } type;
-
-  union {
-    std::uint64_t integer;
-    double decimal;
-  } data;
-
-  auto operator==(const Amount& other) const -> bool {
-    return !(*this < other) && !(*this > other);
-  }
-
-  auto operator<(const Amount& other) const -> bool {
-    if (type == Type::kInteger) {
-      return data.integer < other.data.integer;
-    } else if (type == Type::kDecimal) {
-      return data.decimal < other.data.decimal;
-    }
-    return false;
-  }
-
-  auto operator<=(const Amount& other) const -> bool {
-    return *this < other || *this == other;
-  }
-
-  auto operator>(const Amount& other) const -> bool {
-    if (type == Type::kInteger) {
-      return data.integer > other.data.integer;
-    } else if (type == Type::kDecimal) {
-      return data.decimal > other.data.decimal;
-    }
-    return false;
-  }
-
-  auto operator>=(const Amount& other) const -> bool {
-    return *this > other || *this == other;
-  }
-
-  auto operator+=(const Amount& other) -> Amount& {
-    if (type == Type::kInteger) {
-      data.integer += other.data.integer;
-    } else if (type == Type::kDecimal) {
-      data.decimal += other.data.decimal;
-    }
-    return *this;
-  }
-
-  auto operator-=(const Amount& other) -> Amount& {
-    if (type == Type::kInteger) {
-      data.integer -= other.data.integer;
-    } else if (type == Type::kDecimal) {
-      data.decimal -= other.data.decimal;
-    }
-    return *this;
-  }
-
-  auto operator*(double other) const -> Amount {
-    Amount result = *this;
-    if (type == Type::kInteger) {
-      result.data.integer *= other;
-    } else if (type == Type::kDecimal) {
-      result.data.decimal *= other;
-    }
-    return result;
-  }
-
-  friend std::ostream& operator<<(std::ostream& os, const Amount& amount) {
-    if (amount.type == Amount::Type::kInteger) {
-      os << amount.data.integer;
-    } else if (amount.type == Amount::Type::kDecimal) {
-      os << amount.data.decimal;
-    }
-    return os;
-  }
-};
-
 enum class Type : std::uint8_t {
   kBuy = 0,
   kSell,
@@ -140,7 +61,7 @@ enum class Type : std::uint8_t {
 struct Data {
   common::uid_t UID;
   Instrument instrument;
-  Amount amount;
+  double amount;
   double price;
   Type type;
   std::uint64_t timestamp;
@@ -167,14 +88,14 @@ struct Data {
 
 struct Request {
   Instrument instrument;
-  Amount amount;
+  double amount;
   double price;
   Type type;
 };
 
 struct Response {
   Instrument instrument;
-  Amount amount;
+  double amount;
   double price;
   Type type;
 };

@@ -22,7 +22,7 @@ auto Exchange::Order(const order::Data&& data) -> void {
   MatchOrders(data.instrument.code);
 }
 
-auto Exchange::Balance(common::uid_t uid) -> const std::unordered_map<order::instrument_t, order::Amount>& {
+auto Exchange::Balance(common::uid_t uid) -> const std::unordered_map<order::instrument_t, double>& {
   return m_accounts[uid].m_instruments;
 }
 
@@ -45,8 +45,8 @@ auto Exchange::MatchOrders(order::instrument_t instrument) -> void {
       Account& b_account = m_accounts[b_data.UID];
       Account& s_account = m_accounts[s_data.UID];
 
-      order::Amount& b_amount = b_data.amount;
-      order::Amount& s_amount = s_data.amount;
+      double& b_amount = b_data.amount;
+      double& s_amount = s_data.amount;
       
       if (b_amount > s_amount) {
         s_account.m_instruments[order::Instrument::RUB()] += s_amount * b_data.price;

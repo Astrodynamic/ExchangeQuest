@@ -7,7 +7,7 @@
 namespace balans {
   struct Data {
     order::instrument_t instrument;
-    order::Amount amount;
+    double amount;
   };
 
   struct Request {};

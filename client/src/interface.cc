@@ -124,14 +124,7 @@ auto Interface::InitFuncMenus() -> void {
             return true;
           }
 
-          // if (match[4].length()) {
-            order_request.amount.type = order::Amount::Type::kDecimal;
-            order_request.amount.data.decimal = std::stod(match[3]);
-          // } else {
-          //   order_request.amount.type = order::Amount::Type::kInteger;
-          //   order_request.amount.data.integer = std::stoi(match[3]);
-          // }
-
+          order_request.amount = std::stod(match[3]);
           order_request.price = std::stod(match[5]);
 
           std::string side = match[2];
