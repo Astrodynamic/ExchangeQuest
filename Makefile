@@ -11,8 +11,8 @@ release debug:
 	@$(CMAKE) --preset $@
 	@$(CMAKE) --build $(BUILD) --target all -j $(shell nproc)
 
-.PHONY: test
-test: debug
+.PHONY: tests
+tests: debug
 	$(BUILD)/server/tests/TEST
 
 # Удаление сгенерированных файлов
