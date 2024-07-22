@@ -25,6 +25,8 @@ add_executable(${PROJECT_NAME}
     src/main.cc
 )
 
+add_subdirectory(tests)
+
 target_compile_features(${PROJECT_NAME}
     PRIVATE
     cxx_std_20
