@@ -68,6 +68,7 @@ auto Session::InitializeHandlers() -> void {
         m_handlers[response.type](response);
       }
     });
+    AsyncRead();
   };
 
   m_handlers[command::Type::kOrderResponce] = [this](const command::Data& command) {

@@ -84,7 +84,7 @@ When you start the client, you'll be presented with a menu. Choose the option to
 
 ### 3. Registering a User
 
-To register, select option `2` and follow the prompts to enter your registration details.
+To register, select option `2`.
 
 ```
  --------------------------------------------------------------
@@ -97,8 +97,7 @@ To register, select option `2` and follow the prompts to enter your registration
 | 4. Order                                                     |
 | 5. Balance                                                   |
  --------------------------------------------------------------
-
-Enter your registration details.
+ 
 ```
 
 ### 4. Logging In

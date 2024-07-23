@@ -13,7 +13,6 @@ Client::Client() : m_socket(m_context), m_resolver(m_context) {
 
 Client::~Client() {
   if (m_context_thread) {
-    m_socket.close();
     m_context.stop();
     m_context_thread->join();
   }
@@ -41,11 +40,6 @@ auto Client::Logined() const -> bool {
 }
 
 auto Client::Send(command::Data& command) -> bool {
-  if (!Connected()) {
-    std::cerr << "Socket is not open." << std::endl;
-    return false;
-  }
-
   command.UID = m_UID;
   command.timestamp = static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
 
@@ -116,7 +110,7 @@ auto Client::InitializeHandlers() -> void {
 
 auto Client::AsyncRead() -> void {
   if (!Connected()) {
-    std::cerr << "Socket is not open." << std::endl;
+    std::cerr << "Connection is not open." << std::endl;
     return;
   }
 
@@ -125,7 +119,7 @@ auto Client::AsyncRead() -> void {
 
 auto Client::AsyncWrite() -> void {
   if (!Connected()) {
-    std::cerr << "Socket is not open." << std::endl;
+    std::cerr << "Connection is not open." << std::endl;
     return;
   }
 

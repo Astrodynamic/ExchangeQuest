@@ -110,7 +110,7 @@ auto Interface::InitFuncMenus() -> void {
         std::cin >> input;
         std::cin.ignore();
 
-        std::regex regex(R"(^([A-Z]+)\|(BUY|SELL):([1-9]\d*(\.\d+)?)@([1-9]\d*(\.\d+)?)$)");
+        static std::regex regex(R"(^([A-Z]+)\|(BUY|SELL):([1-9]\d*(\.\d+)?)@([1-9]\d*(\.\d+)?)$)");
         std::smatch match;
         if (std::regex_match(input, match, regex)) {
           command::Data request;
