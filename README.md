@@ -33,12 +33,12 @@ make
 
 To run the server:
 ```sh
-./server/ExchangeQuestServer
+./build/server/ExchangeQuestServer
 ```
 
 To run the client:
 ```sh
-./client/ExchangeQuestClient
+./build/client/ExchangeQuestClient
 ```
 
 ## Testing
@@ -54,12 +54,12 @@ make tests
 
 Start the server:
 ```sh
-./server/ExchangeQuestServer
+./build/server/ExchangeQuestServer
 ```
 
 Start the client:
 ```sh
-./client/ExchangeQuestClient
+./build/client/ExchangeQuestClient
 ```
 
 ### 2. Connecting to the Server
